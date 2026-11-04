@@ -1,0 +1,20 @@
+name: Listen holen
+on:
+  push:
+    paths: ['listen/**']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  holen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p karussell
+          for l in listen/*.txt; do while read -r name url; do [ -n "$name" ] && [ ! -f "karussell/$name" ] && curl -sfL -o "karussell/$name" "$url"; done < "$l"; done
+          git config user.name bilder-bot
+          git config user.email bilder-bot@users.noreply.github.com
+          git add karussell
+          git commit -m "Bilder" || true
+          git push
