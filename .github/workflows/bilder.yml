@@ -1,0 +1,20 @@
+name: Bilder holen
+on:
+  push:
+    paths: ['bilder.txt']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  holen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p karussell
+          while read -r name url; do [ -n "$name" ] && curl -sfL -o "karussell/$name" "$url"; done < bilder.txt
+          git config user.name bilder-bot
+          git config user.email bilder-bot@users.noreply.github.com
+          git add karussell
+          git commit -m "Bilder" || true
+          git push
